@@ -45,7 +45,7 @@ function SolutionDetail() {
           <Block title="Industry Challenge"><p className="text-muted-foreground leading-relaxed">{d.challenge}</p></Block>
           <Block title="The OATHSPAN Approach">
             <ul className="space-y-3">
-              {d.approach.map((a) => (
+              {d.approach.map((a: string) => (
                 <li key={a} className="flex gap-3 items-start"><CheckCircle2 className="h-5 w-5 text-teal mt-0.5 shrink-0" /><span>{a}</span></li>
               ))}
             </ul>
@@ -71,7 +71,7 @@ function SolutionDetail() {
 
           <Block title="Frequently Asked">
             <div className="space-y-3">
-              {d.faq.map((f) => <FAQ key={f.q} q={f.q} a={f.a} />)}
+              {d.faq.map((f: {q:string;a:string}) => <FAQ key={f.q} q={f.q} a={f.a} />)}
             </div>
           </Block>
         </div>
@@ -80,7 +80,7 @@ function SolutionDetail() {
           <div className="rounded-2xl border border-border p-6 bg-card sticky top-24">
             <div className="text-xs uppercase tracking-wider text-teal font-semibold">Outcomes</div>
             <div className="mt-4 space-y-5">
-              {d.metrics.map((m) => (
+              {d.metrics.map((m: {v:string;l:string}) => (
                 <div key={m.l}>
                   <div className="text-3xl font-bold text-navy-deep">{m.v}</div>
                   <div className="text-sm text-muted-foreground">{m.l}</div>

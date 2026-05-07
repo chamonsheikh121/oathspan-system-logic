@@ -36,7 +36,7 @@ function InsightDetail() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const title = slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  const title = slug.replace(/-/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase());
 
   return (
     <SiteLayout>
