@@ -1,19 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Menu, X, ChevronDown } from "lucide-react";
-
-const solutions = [
-  { name: "Revenue Optimization", to: "/solutions" },
-  { name: "Value-Based Care Strategy", to: "/solutions" },
-  { name: "Population Health Intelligence", to: "/solutions" },
-  { name: "Payment & Contracting Analytics", to: "/solutions" },
-  { name: "Enterprise Operational Integration", to: "/solutions" },
-  { name: "Clinical + Financial Alignment", to: "/solutions" },
-  { name: "Healthcare System Performance", to: "/solutions" },
-  { name: "Predictive Intelligence", to: "/solutions" },
-];
+import { Menu, X } from "lucide-react";
 
 const nav = [
+  { label: "Solutions", to: "/solutions" },
   { label: "About", to: "/about" },
   { label: "Platform", to: "/platform" },
   { label: "Industries", to: "/industries" },
@@ -26,7 +16,6 @@ const nav = [
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-  const [mega, setMega] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -48,30 +37,6 @@ export function Navbar() {
         </Link>
 
         <nav className="hidden lg:flex items-center gap-1 text-sm">
-          <div
-            className="relative"
-            onMouseEnter={() => setMega(true)}
-            onMouseLeave={() => setMega(false)}
-          >
-            <button className="flex items-center gap-1 px-3 py-2 rounded-md text-foreground/80 hover:text-navy-deep transition">
-              Solutions <ChevronDown className="h-3.5 w-3.5" />
-            </button>
-            {mega && (
-              <div className="absolute left-1/2 -translate-x-1/2 top-full pt-3 w-[640px] animate-fade-in">
-                <div className="rounded-2xl border border-border bg-background shadow-elegant p-6 grid grid-cols-2 gap-1">
-                  {solutions.map((s) => (
-                    <Link
-                      key={s.name}
-                      to={s.to}
-                      className="px-3 py-2 rounded-md text-sm text-foreground/80 hover:bg-muted hover:text-navy-deep transition"
-                    >
-                      {s.name}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
           {nav.map((n) => (
             <Link
               key={n.to}

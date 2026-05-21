@@ -2,14 +2,20 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/Layout";
 import { Calendar, Clock, ArrowLeft } from "lucide-react";
 import { useEffect, useState } from "react";
+import { insightLookup } from "@/lib/mock/insights";
 
 export const Route = createFileRoute("/insights/$slug")({
-  head: ({ params }) => ({
+  loader: ({ params }) => {
+    const insight = insightLookup[params.slug];
+    if (!insight) throw new Error("Insight not found");
+    return insight;
+  },
+  head: ({ loaderData }) => ({
     meta: [
-      { title: `${params.slug.replace(/-/g, " ")} — OATHSPAN Insights` },
-      { name: "description", content: "Executive perspective from the OATHSPAN team on healthcare economics and intelligence." },
-      { property: "og:title", content: "OATHSPAN Insights" },
-      { property: "og:description", content: "Strategic healthcare thought leadership." },
+      { title: loaderData ? `${loaderData.title} — OATHSPAN Insights` : "OATHSPAN Insights" },
+      { name: "description", content: loaderData?.excerpt ?? "Executive perspective from the OATHSPAN team on healthcare economics and intelligence." },
+      { property: "og:title", content: loaderData?.title ?? "OATHSPAN Insights" },
+      { property: "og:description", content: loaderData?.excerpt ?? "Strategic healthcare thought leadership." },
     ],
   }),
   component: InsightDetail,
@@ -24,7 +30,7 @@ const toc = [
 ];
 
 function InsightDetail() {
-  const { slug } = Route.useParams();
+  const article = Route.useLoaderData();
   const [progress, setProgress] = useState(0);
   useEffect(() => {
     const onScroll = () => {
@@ -36,23 +42,28 @@ function InsightDetail() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const title = slug.replace(/-/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase());
-
   return (
     <SiteLayout>
       <div className="fixed top-16 left-0 right-0 z-40 h-0.5 bg-border">
         <div className="h-full bg-teal transition-all" style={{ width: `${progress}%` }} />
       </div>
 
-      <section className="bg-gradient-subtle border-b border-border">
-        <div className="container-page py-16 max-w-4xl">
-          <Link to="/insights" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-navy mb-6"><ArrowLeft className="h-4 w-4" /> Back to insights</Link>
-          <div className="text-xs font-semibold uppercase tracking-[0.2em] text-teal">Healthcare Economics</div>
-          <h1 className="mt-4 text-4xl md:text-5xl font-bold tracking-tight text-balance">{title}</h1>
-          <div className="mt-6 flex items-center gap-5 text-sm text-muted-foreground">
-            <span className="flex items-center gap-1.5"><Calendar className="h-4 w-4" /> May 2026</span>
-            <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" /> 8 min read</span>
-            <span>By OATHSPAN Editorial</span>
+      <section className="relative min-h-[78vh] overflow-hidden border-b border-border">
+        <img src={article.image} alt={article.title} className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/55 to-black/15" />
+        <div className="absolute inset-0 bg-black/10" />
+        <div className="absolute inset-0 grid-bg opacity-10" />
+        <div className="container-page relative z-10 flex min-h-[78vh] items-end py-12 md:py-16">
+          <div className="max-w-4xl pb-4 md:pb-8">
+            <Link to="/insights" className="inline-flex items-center gap-1 text-sm text-white/85 hover:text-white mb-5"><ArrowLeft className="h-4 w-4" /> Back to insights</Link>
+            <div className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan">{article.category}</div>
+            <h1 className="mt-4 text-4xl md:text-6xl font-bold tracking-tight text-balance text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.45)]">{article.title}</h1>
+            <p className="mt-5 max-w-2xl text-base md:text-lg text-white/88 leading-relaxed drop-shadow-[0_1px_8px_rgba(0,0,0,0.5)]">{article.excerpt}</p>
+            <div className="mt-6 flex flex-wrap items-center gap-5 text-sm text-white/80">
+              <span className="flex items-center gap-1.5"><Calendar className="h-4 w-4" /> {article.date}</span>
+              <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" /> {article.readTime}</span>
+              <span>By {article.author}</span>
+            </div>
           </div>
         </div>
       </section>
@@ -68,7 +79,6 @@ function InsightDetail() {
         </aside>
 
         <article className="max-w-3xl prose-lg">
-          <div className="aspect-[16/9] rounded-2xl bg-gradient-hero mb-10 relative overflow-hidden"><div className="absolute inset-0 grid-bg opacity-15" /></div>
           <p id="intro" className="text-xl text-charcoal leading-relaxed">
             The most consequential decisions in American healthcare are no longer made one contract at a time —
             they are made through the architecture of the entire enterprise.

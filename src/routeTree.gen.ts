@@ -22,6 +22,7 @@ import { Route as CaseStudiesIndexRouteImport } from './routes/case-studies.inde
 import { Route as SolutionsSlugRouteImport } from './routes/solutions.$slug'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as CaseStudiesSlugRouteImport } from './routes/case-studies.$slug'
+import { Route as CareersSlugRouteImport } from './routes/careers.$slug'
 
 const PlatformRoute = PlatformRouteImport.update({
   id: '/platform',
@@ -88,15 +89,21 @@ const CaseStudiesSlugRoute = CaseStudiesSlugRouteImport.update({
   path: '/case-studies/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CareersSlugRoute = CareersSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => CareersRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/careers': typeof CareersRoute
+  '/careers': typeof CareersRouteWithChildren
   '/contact': typeof ContactRoute
   '/industries': typeof IndustriesRoute
   '/leadership': typeof LeadershipRoute
   '/platform': typeof PlatformRoute
+  '/careers/$slug': typeof CareersSlugRoute
   '/case-studies/$slug': typeof CaseStudiesSlugRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/solutions/$slug': typeof SolutionsSlugRoute
@@ -107,11 +114,12 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/careers': typeof CareersRoute
+  '/careers': typeof CareersRouteWithChildren
   '/contact': typeof ContactRoute
   '/industries': typeof IndustriesRoute
   '/leadership': typeof LeadershipRoute
   '/platform': typeof PlatformRoute
+  '/careers/$slug': typeof CareersSlugRoute
   '/case-studies/$slug': typeof CaseStudiesSlugRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/solutions/$slug': typeof SolutionsSlugRoute
@@ -123,11 +131,12 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/careers': typeof CareersRoute
+  '/careers': typeof CareersRouteWithChildren
   '/contact': typeof ContactRoute
   '/industries': typeof IndustriesRoute
   '/leadership': typeof LeadershipRoute
   '/platform': typeof PlatformRoute
+  '/careers/$slug': typeof CareersSlugRoute
   '/case-studies/$slug': typeof CaseStudiesSlugRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/solutions/$slug': typeof SolutionsSlugRoute
@@ -145,6 +154,7 @@ export interface FileRouteTypes {
     | '/industries'
     | '/leadership'
     | '/platform'
+    | '/careers/$slug'
     | '/case-studies/$slug'
     | '/insights/$slug'
     | '/solutions/$slug'
@@ -160,6 +170,7 @@ export interface FileRouteTypes {
     | '/industries'
     | '/leadership'
     | '/platform'
+    | '/careers/$slug'
     | '/case-studies/$slug'
     | '/insights/$slug'
     | '/solutions/$slug'
@@ -175,6 +186,7 @@ export interface FileRouteTypes {
     | '/industries'
     | '/leadership'
     | '/platform'
+    | '/careers/$slug'
     | '/case-studies/$slug'
     | '/insights/$slug'
     | '/solutions/$slug'
@@ -186,7 +198,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  CareersRoute: typeof CareersRoute
+  CareersRoute: typeof CareersRouteWithChildren
   ContactRoute: typeof ContactRoute
   IndustriesRoute: typeof IndustriesRoute
   LeadershipRoute: typeof LeadershipRoute
@@ -292,13 +304,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CaseStudiesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/careers/$slug': {
+      id: '/careers/$slug'
+      path: '/$slug'
+      fullPath: '/careers/$slug'
+      preLoaderRoute: typeof CareersSlugRouteImport
+      parentRoute: typeof CareersRoute
+    }
   }
 }
+
+interface CareersRouteChildren {
+  CareersSlugRoute: typeof CareersSlugRoute
+}
+
+const CareersRouteChildren: CareersRouteChildren = {
+  CareersSlugRoute: CareersSlugRoute,
+}
+
+const CareersRouteWithChildren =
+  CareersRoute._addFileChildren(CareersRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  CareersRoute: CareersRoute,
+  CareersRoute: CareersRouteWithChildren,
   ContactRoute: ContactRoute,
   IndustriesRoute: IndustriesRoute,
   LeadershipRoute: LeadershipRoute,
@@ -313,3 +343,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
