@@ -6,6 +6,7 @@ import {
   ArrowRight, ShieldCheck, Activity, LineChart, Network, Stethoscope,
   Building2, Workflow, Sparkles, Quote, TrendingUp, BarChart3
 } from "lucide-react";
+import { insights } from "@/lib/mock/insights";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -145,18 +146,16 @@ function Home() {
       {/* INSIGHTS */}
       <Section eyebrow="Featured Insights" title="Executive thinking from the OATHSPAN team">
         <div className="grid md:grid-cols-3 gap-6">
-          {[
-            { c: "Value-Based Care", t: "The next decade of risk: building durable VBC economics" },
-            { c: "Healthcare Economics", t: "Why systemness is the new operating standard" },
-            { c: "Operational Excellence", t: "Inside the unified margin: a CFO's playbook" },
-          ].map((p) => (
-            <Link key={p.t} to="/insights" className="group rounded-2xl border border-border overflow-hidden bg-card hover:shadow-elegant transition">
-              <div className="aspect-[16/10] bg-gradient-accent relative">
+          {insights.slice(0, 3).map((p) => (
+            <Link key={p.slug} to={`/insights/${p.slug}`} className="group rounded-2xl border border-border overflow-hidden bg-card hover:shadow-elegant transition">
+              <div className="aspect-[16/10] relative bg-muted">
+                <img src={p.image} alt={p.title} className="absolute inset-0 h-full w-full object-cover" />
                 <div className="absolute inset-0 grid-bg opacity-20" />
               </div>
               <div className="p-6">
-                <div className="text-xs font-semibold uppercase tracking-wider text-teal">{p.c}</div>
-                <h3 className="mt-2 text-lg font-semibold leading-snug group-hover:text-teal transition">{p.t}</h3>
+                <div className="text-xs font-semibold uppercase tracking-wider text-teal">{p.category}</div>
+                <h3 className="mt-2 text-lg font-semibold leading-snug group-hover:text-teal transition">{p.title}</h3>
+                <p className="mt-2 text-sm text-muted-foreground">{p.excerpt}</p>
                 <div className="mt-4 flex items-center gap-1 text-sm text-navy font-medium">Read article <ArrowRight className="h-4 w-4" /></div>
               </div>
             </Link>
